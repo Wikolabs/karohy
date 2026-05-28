@@ -52,19 +52,27 @@ export default function Home() {
       {/* NAVBAR */}
       <nav style={{ background: "#fff", borderBottom: "1px solid #fecaca", position: "sticky", top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <a href="/" style={{ display: "flex", alignItems: "center", gap: 6, textDecoration: "none" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/karohy-logo.png" alt="Karohy.mg" style={{ height: 38, width: "auto", objectFit: "contain" }} />
-            <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 16, color: "#666" }}>.mg</span>
-          </div>
-          <a
-            href="https://calendly.com/wikolabs"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ background: primary, color: "#fff", padding: "10px 22px", borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: "none" }}
-          >
-            Demander une démo
+            <img src="/karohy-logo.png" alt="Karohy.mg" style={{ height: 52, width: "auto", objectFit: "contain" }} />
+            <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 15, color: "#999" }}>.mg</span>
           </a>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <a
+              href="/admin"
+              style={{ fontSize: 13, fontWeight: 600, color: "#999", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #e5e7eb" }}
+            >
+              Admin
+            </a>
+            <a
+              href="https://calendly.com/wikolabs"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ background: primary, color: "#fff", padding: "10px 22px", borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: "none" }}
+            >
+              Demander une démo
+            </a>
+          </div>
         </div>
       </nav>
 

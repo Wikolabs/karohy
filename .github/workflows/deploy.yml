@@ -15,6 +15,9 @@ jobs:
           VM_USER: ${{ secrets.WIKOLABS_VM_USER }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          ADMIN_USER: ${{ secrets.KAROHY_ADMIN_USER }}
+          ADMIN_PASSWORD: ${{ secrets.KAROHY_ADMIN_PASSWORD }}
+          ADMIN_SESSION_TOKEN: ${{ secrets.KAROHY_ADMIN_SESSION_TOKEN }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
@@ -33,6 +36,7 @@ jobs:
             fi
             mkdir -p /opt/karohy/backend
             printf 'GOOGLE_API_KEY=${GOOGLE_API_KEY}\nGROQ_API_KEY=${GROQ_API_KEY}\n' > /opt/karohy/backend/.env
+            printf 'ADMIN_USER=${ADMIN_USER}\nADMIN_PASSWORD=${ADMIN_PASSWORD}\nADMIN_SESSION_TOKEN=${ADMIN_SESSION_TOKEN}\n' > /opt/karohy/app.env
             cd /opt/karohy
             docker compose down --remove-orphans 2>/dev/null || true
             docker compose up -d --build
