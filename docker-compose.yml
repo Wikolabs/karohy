@@ -1,0 +1,59 @@
+﻿services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: karohy-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: karohy
+      POSTGRES_USER: ps
+      POSTGRES_PASSWORD: ps_pgvector_2024
+    volumes:
+      - karohy_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ps -d karohy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - karohy
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: karohy-backend
+    restart: unless-stopped
+    expose:
+      - "8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - POSTGRES_URI=postgresql://ps:ps_pgvector_2024@db:5432/karohy
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - karohy
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: karohy
+    restart: unless-stopped
+    ports:
+      - "3050:3000"
+    depends_on:
+      - backend
+    networks:
+      - karohy
+
+networks:
+  karohy:
+    driver: bridge
+
+volumes:
+  karohy_pg:

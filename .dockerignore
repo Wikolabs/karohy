@@ -1,0 +1,4 @@
+﻿node_modules
+.next
+.git
+backend/.env

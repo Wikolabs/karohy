@@ -1,0 +1,39 @@
+﻿name: Deploy karohy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Deploy to VM via SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.WIKOLABS_VM_SSH_KEY }}
+          VM_HOST: ${{ secrets.WIKOLABS_VM_HOST }}
+          VM_USER: ${{ secrets.WIKOLABS_VM_USER }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=30 \
+            "$VM_USER@$VM_HOST" \
+            "set -e
+            if [ -d /opt/karohy/.git ]; then
+              cd /opt/karohy && git fetch origin main && git reset --hard origin/main
+            else
+              git clone https://github.com/Wikolabs/karohy.git /opt/karohy && cd /opt/karohy
+            fi
+            mkdir -p /opt/karohy/backend
+            printf 'GOOGLE_API_KEY=${GOOGLE_API_KEY}\nGROQ_API_KEY=${GROQ_API_KEY}\n' > /opt/karohy/backend/.env
+            cd /opt/karohy
+            docker compose down --remove-orphans 2>/dev/null || true
+            docker compose up -d --build
+            echo 'Deployed karohy on port 3050'"
