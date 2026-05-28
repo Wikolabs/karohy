@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useRef, useEffect, useCallback, type DragEvent } from "react";
 import { searchPrestataires } from "../services/api";

@@ -1,4 +1,4 @@
-﻿import type { Prestataire, SearchResult } from "../types";
+import type { Prestataire, SearchResult } from "../types";
 
 const BASE = "/api";
 

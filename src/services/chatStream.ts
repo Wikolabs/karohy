@@ -1,4 +1,4 @@
-﻿const BASE = "/api";
+const BASE = "/api";
 
 export async function* chatStream(
   text?: string,

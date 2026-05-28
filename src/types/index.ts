@@ -1,4 +1,4 @@
-﻿export interface Prestataire {
+export interface Prestataire {
   id: string;
   name: string;
   specialty: string;
