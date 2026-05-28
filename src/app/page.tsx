@@ -52,9 +52,11 @@ export default function Home() {
       {/* NAVBAR */}
       <nav style={{ background: "#fff", borderBottom: "1px solid #fecaca", position: "sticky", top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22, color: primary }}>
-            Karohy.mg
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/karohy-logo.png" alt="Karohy.mg" style={{ height: 38, width: "auto", objectFit: "contain" }} />
+            <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 16, color: "#666" }}>.mg</span>
+          </div>
           <a
             href="https://calendly.com/wikolabs"
             target="_blank"
@@ -203,7 +205,11 @@ export default function Home() {
       {/* FOOTER */}
       <footer style={{ background: "#111", padding: "40px 24px", textAlign: "center" }}>
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 20, color: primary }}>Karohy.mg</span>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#fff", borderRadius: 10, padding: "6px 14px" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/karohy-logo.png" alt="Karohy.mg" style={{ height: 32, width: "auto", objectFit: "contain" }} />
+            <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 15, color: "#666" }}>.mg</span>
+          </div>
           <p style={{ color: "#999", marginTop: 12, fontSize: 14 }}>
             by{" "}
             <a href="https://wikolabs.com" target="_blank" rel="noopener noreferrer" style={{ color: "#ccc", textDecoration: "none" }}>
