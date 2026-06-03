@@ -5,7 +5,7 @@ import time
 from google.genai.errors import ClientError
 
 from embedding_service import EmbeddingService
-from models import Prestataire
+from models import Prestataire, ServiceDetail
 from vector_store import PGVectorStore
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,21 @@ SEED_PRESTATAIRES: list[Prestataire] = [
         phone="+33 6 12 34 56 78",
         email="jean.dupont@plumbing.com",
         rating=4.7,
+        organization="Dupont Plumbing SARL",
+        specialties=["Emergency repairs", "Sanitary installation", "Water heater", "Drain unclogging"],
+        bio=(
+            "Master plumber since 2008, serving Paris and suburbs. Available 24/7 for emergencies. "
+            "Insured, with a 12-month workmanship warranty on every installation. "
+            "We come to you, diagnose on-site and quote within 30 minutes."
+        ),
+        address="14 rue de Belleville, 75020 Paris",
+        latitude=48.8722,
+        longitude=2.3845,
+        services_detail=[
+            ServiceDetail(name="Emergency leak repair", price=80, currency="€", duration_min=60, options=["home_visit"]),
+            ServiceDetail(name="Water heater replacement", price=420, currency="€", duration_min=180, options=["home_visit", "in_office"]),
+            ServiceDetail(name="Diagnostic call", price=0, currency="€", duration_min=15, options=["video_call"]),
+        ],
     ),
     Prestataire(
         name="Elec Pro Services",

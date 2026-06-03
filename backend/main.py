@@ -3,7 +3,7 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import Cookie, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from google.genai.errors import APIError as GeminiAPIError
@@ -12,7 +12,16 @@ from groq import APIError as GroqAPIError
 from chat_service import ChatService
 from config import Settings
 from embedding_service import EmbeddingService, UnsupportedImageError
-from models import Prestataire, SearchRequest, SearchResult
+from auth_service import AuthService, SESSION_COOKIE_NAME, SESSION_LIFETIME_DAYS
+from models import (
+    ConnectRequest,
+    LoginRequest,
+    Prestataire,
+    SearchRequest,
+    SearchResult,
+    SignupRequest,
+    UserPublic,
+)
 from seed_data import load_seed_prestataires
 from vector_store import PGVectorStore
 
@@ -23,13 +32,15 @@ settings = Settings()
 embed_svc = EmbeddingService(settings)
 chat_svc = ChatService(settings)
 vector_store: PGVectorStore | None = None
+auth_svc: AuthService | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global vector_store
+    global vector_store, auth_svc
     dsn = os.getenv("POSTGRES_URI", "postgresql://ps:ps_pgvector_2024@db:5432/karohy")
     vector_store = await PGVectorStore.create(dsn)
+    auth_svc = AuthService(vector_store.pool)
     try:
         await load_seed_prestataires(vector_store, embed_svc)
     except Exception as e:
@@ -65,6 +76,15 @@ async def health():
 @app.get("/prestataires", response_model=list[Prestataire])
 async def list_prestataires():
     return await _store().list_all()
+
+
+# --- GET /prestataires/{id} ---
+@app.get("/prestataires/{prestataire_id}", response_model=Prestataire)
+async def get_prestataire(prestataire_id: str):
+    p = await _store().get(prestataire_id)
+    if not p:
+        raise HTTPException(404, "Prestataire not found")
+    return p
 
 
 # --- POST /prestataires ---
@@ -215,3 +235,65 @@ async def chat(request: SearchRequest):
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
 
+
+# ── Auth & Connect (Lot 3+) ─────────────────────────────────────────────────
+def _auth() -> AuthService:
+    if auth_svc is None:
+        raise HTTPException(503, "Auth not ready")
+    return auth_svc
+
+
+def _set_session_cookie(response: Response, token: str) -> None:
+    response.set_cookie(
+        SESSION_COOKIE_NAME,
+        token,
+        max_age=SESSION_LIFETIME_DAYS * 24 * 3600,
+        httponly=True,
+        samesite="lax",
+        path="/",
+    )
+
+
+@app.post("/auth/signup", response_model=UserPublic)
+async def auth_signup(req: SignupRequest, response: Response):
+    try:
+        user = await _auth().signup(req.username, req.password, req.full_name, req.email)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+    _, token = await _auth().login(req.username, req.password)
+    _set_session_cookie(response, token)
+    return user
+
+
+@app.post("/auth/login", response_model=UserPublic)
+async def auth_login(req: LoginRequest, response: Response):
+    try:
+        user, token = await _auth().login(req.username, req.password)
+    except ValueError as e:
+        raise HTTPException(401, str(e)) from e
+    _set_session_cookie(response, token)
+    return user
+
+
+@app.get("/auth/me", response_model=UserPublic | None)
+async def auth_me(karohy_session: str | None = Cookie(default=None)):
+    return await _auth().me(karohy_session)
+
+
+@app.post("/auth/logout")
+async def auth_logout(response: Response, karohy_session: str | None = Cookie(default=None)):
+    await _auth().logout(karohy_session)
+    response.delete_cookie(SESSION_COOKIE_NAME, path="/")
+    return {"ok": True}
+
+
+@app.post("/connect")
+async def connect(req: ConnectRequest, karohy_session: str | None = Cookie(default=None)):
+    user = await _auth().me(karohy_session)
+    if not user:
+        raise HTTPException(401, "Login required")
+    prestataire = await _store().get(req.prestataire_id)
+    if not prestataire:
+        raise HTTPException(404, "Prestataire not found")
+    created = await _auth().register_connection(user.id, req.prestataire_id, req.message)
+    return {"ok": True, "created": created, "prestataire_name": prestataire.name}

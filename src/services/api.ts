@@ -8,6 +8,12 @@ export async function getPrestataires(): Promise<Prestataire[]> {
   return res.json();
 }
 
+export async function getPrestataire(id: string): Promise<Prestataire> {
+  const res = await fetch(`${BASE}/prestataires/${encodeURIComponent(id)}`);
+  if (!res.ok) throw new Error("Failed to fetch prestataire");
+  return res.json();
+}
+
 export async function addPrestataire(form: FormData): Promise<string> {
   const res = await fetch(`${BASE}/prestataires`, {
     method: "POST",
