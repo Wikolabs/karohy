@@ -1,3 +1,6 @@
+"""Mock Malagasy prestataires across multiple categories, vectorised on startup."""
+from __future__ import annotations
+
 import asyncio
 import logging
 import time
@@ -10,241 +13,525 @@ from vector_store import PGVectorStore
 
 logger = logging.getLogger(__name__)
 
+
+# Tana districts with approximate coordinates (lat, lng)
+TANA_GEO = {
+    "Analakely":       (-18.9100, 47.5210),
+    "Ankorondrano":    (-18.8800, 47.5230),
+    "Ivandry":         (-18.8580, 47.5530),
+    "Antaninarenina":  (-18.9143, 47.5219),
+    "Antanimena":      (-18.9000, 47.5180),
+    "67ha":            (-18.9300, 47.5100),
+    "Itaosy":          (-18.9200, 47.4600),
+    "Tanjombato":      (-18.9700, 47.5300),
+    "Ambohimanarina":  (-18.8500, 47.5050),
+    "Ambatobe":        (-18.8650, 47.5680),
+    "Soanierana":      (-18.9450, 47.5360),
+    "Soavimbahoaka":   (-18.8950, 47.5460),
+}
+
+
+def _tana(quartier: str) -> tuple[float, float]:
+    return TANA_GEO.get(quartier, (-18.8792, 47.5079))
+
+
 SEED_PRESTATAIRES: list[Prestataire] = [
-    # --- Construction (3) ---
+    # ── Plomberie (3) ────────────────────────────────────────────────────────
     Prestataire(
-        name="Jean Dupont Plumbing",
-        specialty="Plumbing",
-        description="Experienced plumber specializing in emergency repairs, sanitary fixture installation, and drain unclogging. Fast response within 1 hour.",
-        services=["leak repair", "drain unclogging", "sanitary installation", "water heater"],
-        city="Paris",
-        country="France",
-        hourly_rate=55.0,
-        phone="+33 6 12 34 56 78",
-        email="jean.dupont@plumbing.com",
-        rating=4.7,
-        organization="Dupont Plumbing SARL",
-        specialties=["Emergency repairs", "Sanitary installation", "Water heater", "Drain unclogging"],
-        bio=(
-            "Master plumber since 2008, serving Paris and suburbs. Available 24/7 for emergencies. "
-            "Insured, with a 12-month workmanship warranty on every installation. "
-            "We come to you, diagnose on-site and quote within 30 minutes."
-        ),
-        address="14 rue de Belleville, 75020 Paris",
-        latitude=48.8722,
-        longitude=2.3845,
+        name="Rakoto Andry",
+        organization="Andry Plomberie SARL",
+        specialty="Plomberie",
+        category="plumbing",
+        description="Plombier expérimenté à Antananarivo. Réparations urgences, installation sanitaire, chauffe-eau solaire. Intervention sous 1h dans Tana.",
+        services=["fuites", "débouchage", "chauffe-eau", "robinetterie", "installation sanitaire"],
+        specialties=["Urgence 24/7", "Chauffe-eau solaire", "Plomberie écologique"],
+        bio="Maître plombier depuis 2010. Spécialisé urgences nocturnes et installations chauffe-eau solaire à Tana. Devis gratuit sous 30 min. Garantie 12 mois.",
+        city="Antananarivo", country="Madagascar", address="Lot II M 23 Ankorondrano",
+        latitude=_tana("Ankorondrano")[0], longitude=_tana("Ankorondrano")[1],
+        languages=["mg", "fr"],
+        emergency_available=True, verified=True, rating=4.7,
+        years_experience=14, response_time_hours=1, team_size=3,
+        accepts_payment=["cash", "mvola", "orange_money"],
+        certifications=["CAP Plomberie", "Habilitation chauffe-eau"],
+        service_radius_km=15,
+        hourly_rate=25000, min_price=15000, max_price=400000, currency="Ar",
+        phone="+261 34 12 345 67", email="rakoto@andryplomberie.mg",
         services_detail=[
-            ServiceDetail(name="Emergency leak repair", price=80, currency="€", duration_min=60, options=["home_visit"]),
-            ServiceDetail(name="Water heater replacement", price=420, currency="€", duration_min=180, options=["home_visit", "in_office"]),
-            ServiceDetail(name="Diagnostic call", price=0, currency="€", duration_min=15, options=["video_call"]),
+            ServiceDetail(name="Diagnostic urgence", price=15000, currency="Ar", duration_min=30, options=["home_visit", "video_call"]),
+            ServiceDetail(name="Réparation fuite", price=45000, currency="Ar", duration_min=60, options=["home_visit"]),
+            ServiceDetail(name="Pose chauffe-eau solaire", price=380000, currency="Ar", duration_min=240, options=["home_visit"]),
         ],
     ),
     Prestataire(
-        name="Elec Pro Services",
-        specialty="Electrical",
-        description="Certified electrician for new installations, code compliance upgrades, and electrical troubleshooting for residential and commercial buildings.",
-        services=["electrical installation", "code compliance", "troubleshooting", "electrical panel", "home automation"],
-        city="Lyon",
-        country="France",
-        hourly_rate=50.0,
-        phone="+33 6 23 45 67 89",
-        email="contact@elecpro.com",
-        rating=4.5,
+        name="Naina Plombier",
+        specialty="Plomberie",
+        category="plumbing",
+        description="Plombier indépendant, intervention rapide dans tout Antananarivo. Spécialité fuites et installation cuisine/salle de bain.",
+        services=["fuites", "installation", "rénovation cuisine"],
+        bio="6 ans d'expérience. Disponible week-end. Travail soigné, prix abordables.",
+        city="Antananarivo", country="Madagascar", address="Itaosy lot 134",
+        latitude=_tana("Itaosy")[0], longitude=_tana("Itaosy")[1],
+        languages=["mg", "fr"],
+        rating=4.3, years_experience=6, response_time_hours=4,
+        accepts_payment=["cash", "mvola"],
+        hourly_rate=18000, min_price=10000, max_price=180000, currency="Ar",
+        phone="+261 33 22 111 09",
+        services_detail=[
+            ServiceDetail(name="Intervention dépannage", price=20000, currency="Ar", duration_min=45, options=["home_visit"]),
+        ],
+    ),
+
+    # ── Électricité (2) ──────────────────────────────────────────────────────
+    Prestataire(
+        name="Hery Andrianjafy",
+        organization="Hery Élec SARL",
+        specialty="Électricité",
+        category="electrical",
+        description="Électricien certifié JIRAMA, installations résidentielles et tertiaires. Mise aux normes, domotique, panneaux solaires.",
+        services=["installation électrique", "mise aux normes", "domotique", "panneaux solaires"],
+        specialties=["Solaire off-grid", "Domotique", "Mise aux normes JIRAMA"],
+        bio="Diplômé IST Antananarivo. Certifié JIRAMA. Installations résidentielles et solaire off-grid pour zones rurales.",
+        city="Antananarivo", country="Madagascar", address="Ivandry lot II 45",
+        latitude=_tana("Ivandry")[0], longitude=_tana("Ivandry")[1],
+        languages=["mg", "fr", "en"],
+        verified=True, rating=4.8, years_experience=12, response_time_hours=2,
+        team_size=4, emergency_available=True,
+        accepts_payment=["cash", "mvola", "card", "bank_transfer"],
+        certifications=["JIRAMA", "BTS Électrotechnique"],
+        service_radius_km=30,
+        hourly_rate=35000, min_price=20000, max_price=2500000, currency="Ar",
+        phone="+261 34 56 789 01", email="hery@heryelec.mg",
+        services_detail=[
+            ServiceDetail(name="Diagnostic installation", price=20000, currency="Ar", duration_min=45, options=["home_visit", "in_office"]),
+            ServiceDetail(name="Pose tableau électrique", price=380000, currency="Ar", duration_min=180, options=["home_visit"]),
+            ServiceDetail(name="Kit solaire 500W complet", price=2200000, currency="Ar", duration_min=480, options=["home_visit"]),
+        ],
     ),
     Prestataire(
-        name="Colors & Finishes",
-        specialty="Painting",
-        description="House painter for interior and exterior work. Wallpaper hanging, plastering, and facade renovation.",
-        services=["interior painting", "exterior painting", "wallpaper", "plastering", "facade renovation"],
-        city="Marseille",
-        country="France",
-        hourly_rate=40.0,
-        phone="+33 6 34 56 78 90",
-        email="info@colors-finishes.com",
-        rating=4.3,
+        name="Tahina Élec",
+        specialty="Électricité",
+        category="electrical",
+        description="Dépannage électrique rapide. Spécialiste petite installation maison.",
+        services=["dépannage", "prises", "interrupteurs", "éclairage LED"],
+        city="Antananarivo", country="Madagascar", address="67ha",
+        latitude=_tana("67ha")[0], longitude=_tana("67ha")[1],
+        languages=["mg", "fr"],
+        rating=4.1, years_experience=4,
+        accepts_payment=["cash", "mvola"],
+        hourly_rate=15000, min_price=10000, max_price=150000, currency="Ar",
+        phone="+261 32 11 234 56",
     ),
-    # --- Beauty (2) ---
+
+    # ── Beauté / Coiffure (3) ────────────────────────────────────────────────
     Prestataire(
-        name="Elegance Salon",
-        specialty="Hairdressing",
-        description="Hair salon offering cuts, coloring, highlights, and event hairstyling. Specialist in curly and coily hair.",
-        services=["haircut", "coloring", "highlights", "straightening", "wedding hairstyle"],
-        city="Bordeaux",
-        country="France",
-        hourly_rate=45.0,
-        phone="+33 5 56 78 90 12",
-        email="booking@elegance-salon.com",
-        rating=4.8,
-    ),
-    Prestataire(
-        name="Zen Beauty Institute",
-        specialty="Esthetics",
-        description="Beauty institute offering facial care, waxing, manicures, and relaxing massages. Organic and natural products.",
-        services=["facial care", "waxing", "manicure", "pedicure", "massage"],
-        city="Nice",
-        country="France",
-        hourly_rate=50.0,
-        phone="+33 4 93 12 34 56",
-        email="contact@zen-beauty.com",
-        rating=4.6,
-    ),
-    # --- Auto (2) ---
-    Prestataire(
-        name="Martin Garage",
-        specialty="Auto mechanics",
-        description="Multi-brand garage for maintenance, repair, oil changes, brakes, and electronic diagnostics. Free quote.",
-        services=["oil change", "brakes", "diagnostics", "clutch", "air conditioning"],
-        city="Toulouse",
-        country="France",
-        hourly_rate=60.0,
-        phone="+33 5 61 23 45 67",
-        email="martin.garage@auto.com",
-        rating=4.4,
+        name="Salon Voahangy",
+        organization="Salon Voahangy",
+        specialty="Coiffure",
+        category="beauty",
+        description="Salon de coiffure femme spécialisé cheveux crépus, tissage, défrisage et événementiel mariage.",
+        services=["coupe", "tissage", "défrisage", "coloration", "coiffure mariage"],
+        specialties=["Cheveux crépus", "Tissage premium", "Coiffure mariage", "Soin capillaire"],
+        bio="Salon ouvert depuis 2015 à Analakely. Équipe de 5 coiffeuses. Spécialité cheveux afro-malgaches.",
+        city="Antananarivo", country="Madagascar", address="Rue Rainibetsimisaraka, Analakely",
+        latitude=_tana("Analakely")[0], longitude=_tana("Analakely")[1],
+        languages=["mg", "fr"],
+        verified=True, rating=4.6, years_experience=10, team_size=5,
+        accepts_payment=["cash", "mvola", "orange_money", "card"],
+        hourly_rate=0, min_price=15000, max_price=350000, currency="Ar",
+        phone="+261 34 78 901 23", email="salon.voahangy@mg.com",
+        services_detail=[
+            ServiceDetail(name="Coupe femme", price=25000, currency="Ar", duration_min=45, options=["in_office", "home_visit"]),
+            ServiceDetail(name="Tissage complet", price=120000, currency="Ar", duration_min=180, options=["in_office"]),
+            ServiceDetail(name="Forfait mariage", price=320000, currency="Ar", duration_min=240, options=["home_visit"]),
+        ],
     ),
     Prestataire(
-        name="Prestige Bodywork",
-        specialty="Auto bodywork",
-        description="Specialist in bodywork repair, paintless dent removal, automotive painting, and polishing.",
-        services=["dent removal", "auto painting", "polishing", "bumper repair", "rust protection"],
-        city="Nantes",
-        country="France",
-        hourly_rate=65.0,
-        phone="+33 2 40 12 34 56",
-        email="contact@prestige-bodywork.com",
-        rating=4.2,
-    ),
-    # --- IT (2) ---
-    Prestataire(
-        name="WebDev Studio",
-        specialty="Web development",
-        description="Freelance web developer specializing in landing pages, e-commerce, and custom web applications. React, Node.js, Python stack.",
-        services=["landing page", "e-commerce", "web application", "SEO", "maintenance"],
-        city="Paris",
-        country="France",
-        hourly_rate=75.0,
-        phone="+33 6 45 67 89 01",
-        email="hello@webdev-studio.com",
-        rating=4.9,
+        name="Manuhair Vola",
+        specialty="Manucure & soins ongles",
+        category="beauty",
+        description="Spécialiste manucure, pose ongles gel, French nails, déco artistique. Intervention à domicile possible.",
+        services=["manucure", "pose ongles", "French", "nail art"],
+        bio="3 ans dans le métier, formée à Réunion. Style minimaliste et créatif.",
+        city="Antananarivo", country="Madagascar", address="Ankorondrano",
+        latitude=_tana("Ankorondrano")[0], longitude=_tana("Ankorondrano")[1],
+        languages=["mg", "fr"],
+        rating=4.5, years_experience=3,
+        accepts_payment=["mvola", "orange_money"],
+        hourly_rate=0, min_price=20000, max_price=80000, currency="Ar",
+        phone="+261 33 44 567 89",
+        services_detail=[
+            ServiceDetail(name="Manucure simple", price=20000, currency="Ar", duration_min=45, options=["home_visit", "in_office"]),
+            ServiceDetail(name="Pose gel + nail art", price=75000, currency="Ar", duration_min=120, options=["home_visit", "in_office"]),
+        ],
     ),
     Prestataire(
-        name="SOS Computing",
-        specialty="Computer repair",
-        description="On-site computer repair: PC/Mac repair, virus removal, data recovery, WiFi network setup.",
-        services=["PC repair", "virus removal", "data recovery", "WiFi setup", "training"],
-        city="Lille",
-        country="France",
-        hourly_rate=45.0,
-        phone="+33 3 20 12 34 56",
-        email="help@sos-computing.com",
-        rating=4.3,
+        name="Mialy Massage",
+        specialty="Massage bien-être",
+        category="healthcare",
+        description="Masseuse formée à la kinésithérapie traditionnelle malgache (kabarana). Massages relaxants et thérapeutiques.",
+        services=["massage relaxant", "kabarana", "réflexologie", "massage prénatal"],
+        specialties=["Kabarana traditionnel", "Massage prénatal", "Réflexologie plantaire"],
+        bio="Diplôme IFP. 8 ans d'expérience. Mélange techniques modernes et savoir-faire malgache.",
+        city="Antananarivo", country="Madagascar", address="Ivandry",
+        latitude=_tana("Ivandry")[0], longitude=_tana("Ivandry")[1],
+        languages=["mg", "fr"],
+        verified=True, rating=4.9, years_experience=8,
+        accepts_payment=["cash", "mvola"],
+        hourly_rate=0, min_price=40000, max_price=120000, currency="Ar",
+        phone="+261 34 91 234 56",
+        services_detail=[
+            ServiceDetail(name="Massage 60 min", price=70000, currency="Ar", duration_min=60, options=["home_visit", "in_office"]),
+            ServiceDetail(name="Massage 90 min + huiles", price=110000, currency="Ar", duration_min=90, options=["home_visit", "in_office"]),
+        ],
     ),
-    # --- Health (2) ---
+
+    # ── Construction (3) ─────────────────────────────────────────────────────
     Prestataire(
-        name="Kine Plus Clinic",
-        specialty="Physiotherapy",
-        description="Certified physiotherapist for post-operative rehabilitation, back pain treatment, sports and respiratory physiotherapy.",
-        services=["rehabilitation", "back pain", "sports physiotherapy", "respiratory physiotherapy", "therapeutic massage"],
-        city="Strasbourg",
-        country="France",
-        hourly_rate=55.0,
-        phone="+33 3 88 12 34 56",
-        email="booking@kine-plus.com",
-        rating=4.7,
-    ),
-    Prestataire(
-        name="Express Home Care",
-        specialty="Nursing care",
-        description="Home-visit nurse for injections, dressings, IV drips, blood draws, and post-hospitalization follow-up. Available 7 days a week.",
-        services=["injections", "dressings", "IV drips", "blood draws", "post-op follow-up"],
-        city="Montpellier",
-        country="France",
-        hourly_rate=40.0,
-        phone="+33 4 67 12 34 56",
-        email="contact@home-care.com",
-        rating=4.8,
-    ),
-    # --- Home (2) ---
-    Prestataire(
-        name="Clean & Shine",
-        specialty="Cleaning",
-        description="Professional home cleaning service. Regular cleaning, deep cleaning, post-move cleaning. Trusted staff.",
-        services=["regular cleaning", "deep cleaning", "ironing", "window cleaning", "post-move cleaning"],
-        city="Lyon",
-        country="France",
-        hourly_rate=25.0,
-        phone="+33 6 56 78 90 12",
-        email="reservations@clean-shine.com",
-        rating=4.5,
+        name="Rabe Maçon",
+        organization="Rabe BTP",
+        specialty="Maçonnerie",
+        category="construction",
+        description="Entreprise BTP spécialisée construction maison individuelle, agrandissement et rénovation.",
+        services=["construction maison", "agrandissement", "rénovation", "carrelage", "toiture"],
+        specialties=["Maison clé en main", "Rénovation patrimoine", "Carrelage"],
+        bio="Équipe de 12 maçons. Réalise 30+ chantiers/an sur Tana et périphérie. Devis détaillé en 48h.",
+        city="Antananarivo", country="Madagascar", address="Tanjombato",
+        latitude=_tana("Tanjombato")[0], longitude=_tana("Tanjombato")[1],
+        languages=["mg", "fr"],
+        verified=True, rating=4.4, years_experience=20, team_size=12,
+        accepts_payment=["cash", "bank_transfer", "mvola"],
+        certifications=["Inscription registre BTP Madagascar"],
+        hourly_rate=0, min_price=500000, max_price=120000000, currency="Ar",
+        phone="+261 34 65 789 12",
+        services_detail=[
+            ServiceDetail(name="Visite chantier + devis", price=0, currency="Ar", duration_min=90, options=["home_visit"]),
+            ServiceDetail(name="Mur parpaing 10 m²", price=850000, currency="Ar", duration_min=480, options=["home_visit"]),
+        ],
     ),
     Prestataire(
-        name="Eden Gardens",
-        specialty="Gardening",
-        description="Landscape gardener for garden maintenance, hedge trimming, lawn mowing, green space design, and tree pruning.",
-        services=["lawn mowing", "hedge trimming", "tree pruning", "garden design", "automatic watering"],
-        city="Rennes",
-        country="France",
-        hourly_rate=35.0,
-        phone="+33 2 99 12 34 56",
-        email="contact@eden-gardens.com",
-        rating=4.4,
-    ),
-    # --- Miscellaneous (2) ---
-    Prestataire(
-        name="Lumiere Photo Studio",
-        specialty="Photography",
-        description="Professional photographer for weddings, portraits, corporate events, and product shoots. Retouching included.",
-        services=["wedding", "portrait", "event", "product shoot", "photo retouching"],
-        city="Paris",
-        country="France",
-        hourly_rate=80.0,
-        phone="+33 6 67 89 01 23",
-        email="booking@lumiere-studio.com",
-        rating=4.9,
+        name="Naivo Peintre",
+        specialty="Peinture & finition",
+        category="construction",
+        description="Peintre en bâtiment, intérieur et façade. Travail soigné, finitions premium.",
+        services=["peinture intérieure", "façade", "papier peint", "enduit décoratif"],
+        bio="10 ans dans la peinture résidentielle. Travail propre, respect des délais.",
+        city="Antananarivo", country="Madagascar", address="Soavimbahoaka",
+        latitude=_tana("Soavimbahoaka")[0], longitude=_tana("Soavimbahoaka")[1],
+        languages=["mg", "fr"],
+        rating=4.5, years_experience=10, team_size=2,
+        accepts_payment=["cash", "mvola", "orange_money"],
+        hourly_rate=15000, min_price=80000, max_price=4000000, currency="Ar",
+        phone="+261 33 87 456 23",
     ),
     Prestataire(
-        name="Math+ Private Tutor",
-        specialty="Private tutoring",
-        description="Certified private tutor for math, physics, and chemistry classes from middle school to prep courses. Study skills and exam preparation.",
-        services=["math", "physics", "chemistry", "high school exam prep", "entrance exam prep"],
-        city="Grenoble",
-        country="France",
-        hourly_rate=35.0,
-        phone="+33 4 76 12 34 56",
-        email="classes@math-plus.com",
-        rating=4.6,
+        name="Soa Carrelage",
+        specialty="Pose carrelage & faïence",
+        category="construction",
+        description="Pose de carrelage sol et mur, faïence salle de bain et cuisine. Travaux propres et alignés.",
+        services=["carrelage sol", "faïence cuisine", "salle de bain", "extérieur terrasse"],
+        city="Antananarivo", country="Madagascar", address="Antaninarenina",
+        latitude=_tana("Antaninarenina")[0], longitude=_tana("Antaninarenina")[1],
+        languages=["mg", "fr"],
+        rating=4.6, years_experience=8,
+        accepts_payment=["cash", "mvola"],
+        hourly_rate=20000, min_price=120000, max_price=2500000, currency="Ar",
+        phone="+261 34 22 988 76",
+    ),
+
+    # ── Mécanique auto / moto (2) ────────────────────────────────────────────
+    Prestataire(
+        name="Garage Tafita",
+        organization="Garage Tafita SARL",
+        specialty="Mécanique automobile",
+        category="mechanic",
+        description="Garage tous véhicules, vidange, embrayage, suspension, climatisation. Spécialiste Renault, Peugeot, Toyota.",
+        services=["vidange", "embrayage", "suspension", "diagnostic OBD", "climatisation auto"],
+        specialties=["Renault", "Peugeot", "Toyota Hilux", "Diagnostic OBD II"],
+        bio="Garage Antaninarenina depuis 2008. Équipe de 6 mécaniciens diplômés. Devis transparent.",
+        city="Antananarivo", country="Madagascar", address="Antaninarenina, près du marché",
+        latitude=_tana("Antaninarenina")[0], longitude=_tana("Antaninarenina")[1],
+        languages=["mg", "fr"],
+        verified=True, rating=4.5, years_experience=17, team_size=6,
+        accepts_payment=["cash", "mvola", "bank_transfer"],
+        hourly_rate=20000, min_price=30000, max_price=4500000, currency="Ar",
+        phone="+261 34 11 223 34", email="contact@garagetafita.mg",
+        services_detail=[
+            ServiceDetail(name="Vidange complète", price=85000, currency="Ar", duration_min=60, options=["in_office"]),
+            ServiceDetail(name="Diagnostic électronique", price=40000, currency="Ar", duration_min=45, options=["in_office", "video_call"]),
+        ],
+    ),
+    Prestataire(
+        name="Faly Moto",
+        specialty="Mécanique moto & scooter",
+        category="mechanic",
+        description="Spécialiste mécanique deux-roues, entretien, embrayage, carburateur, électrique scooter et motos chinoises.",
+        services=["entretien moto", "réparation", "carburateur", "transmission"],
+        city="Antananarivo", country="Madagascar", address="Ambohimanarina",
+        latitude=_tana("Ambohimanarina")[0], longitude=_tana("Ambohimanarina")[1],
+        languages=["mg"],
+        rating=4.4, years_experience=7,
+        accepts_payment=["cash", "mvola"],
+        hourly_rate=12000, min_price=8000, max_price=350000, currency="Ar",
+        phone="+261 33 77 119 22",
+    ),
+
+    # ── Tech / Dev web (2) ───────────────────────────────────────────────────
+    Prestataire(
+        name="Andry Dev",
+        organization="Andry Studio",
+        specialty="Développeur web fullstack",
+        category="tech",
+        description="Développeur web freelance React, Next.js, Node.js. Sites e-commerce, vitrines, dashboards. Travail à distance worldwide.",
+        services=["site vitrine", "e-commerce", "dashboard", "API REST", "mobile app"],
+        specialties=["React/Next.js", "Node.js", "PostgreSQL", "Stripe payment", "Mobile money integration"],
+        bio="MSc Informatique. 7 ans dev fullstack. Spécialiste paiement mobile money MGA pour startups locales.",
+        city="Antananarivo", country="Madagascar",
+        latitude=_tana("Ankorondrano")[0], longitude=_tana("Ankorondrano")[1],
+        languages=["mg", "fr", "en"],
+        verified=True, rating=5.0, years_experience=7, response_time_hours=4,
+        accepts_payment=["mvola", "card", "bank_transfer"],
+        certifications=["MSc Informatique", "AWS Certified"],
+        hourly_rate=80000, min_price=300000, max_price=25000000, currency="Ar",
+        phone="+261 34 91 882 17", email="andry@andry.dev",
+        services_detail=[
+            ServiceDetail(name="Site vitrine 5 pages", price=1800000, currency="Ar", duration_min=2400, options=["video_call"]),
+            ServiceDetail(name="Audit + devis", price=0, currency="Ar", duration_min=45, options=["video_call"]),
+            ServiceDetail(name="Maintenance mensuelle", price=350000, currency="Ar", duration_min=0, options=["video_call"]),
+        ],
+    ),
+    Prestataire(
+        name="Sandratra Mobile",
+        specialty="Développeur mobile Flutter",
+        category="tech",
+        description="Apps mobiles Flutter cross-platform iOS + Android. Intégration paiement Mvola, Orange Money, Airtel Money.",
+        services=["app Flutter", "intégration paiement mobile", "publication stores"],
+        bio="5 ans Flutter. 12+ apps publiées sur Play Store.",
+        city="Antananarivo", country="Madagascar",
+        latitude=_tana("Ivandry")[0], longitude=_tana("Ivandry")[1],
+        languages=["mg", "fr", "en"],
+        rating=4.8, years_experience=5,
+        accepts_payment=["mvola", "card", "bank_transfer"],
+        hourly_rate=65000, min_price=400000, max_price=18000000, currency="Ar",
+        phone="+261 33 90 712 45",
+    ),
+
+    # ── Photographie / événement (2) ────────────────────────────────────────
+    Prestataire(
+        name="Lova Photo",
+        organization="Lova Studio",
+        specialty="Photographe événement",
+        category="photo",
+        description="Photographe mariage, événementiel et corporate. Studio à Antaninarenina et déplacement national.",
+        services=["mariage", "événementiel", "portrait corporate", "produit"],
+        specialties=["Mariage", "Corporate", "Studio packshot"],
+        bio="12 ans dans la photo événementielle. Équipement Sony A7R V + lumières studio.",
+        city="Antananarivo", country="Madagascar", address="Antaninarenina",
+        latitude=_tana("Antaninarenina")[0], longitude=_tana("Antaninarenina")[1],
+        languages=["mg", "fr", "en"],
+        verified=True, rating=4.8, years_experience=12, team_size=2,
+        accepts_payment=["cash", "mvola", "card", "bank_transfer"],
+        hourly_rate=0, min_price=350000, max_price=12000000, currency="Ar",
+        phone="+261 34 56 234 11", email="lova@lovaphoto.mg",
+        services_detail=[
+            ServiceDetail(name="Mariage demi-journée", price=2500000, currency="Ar", duration_min=240, options=["home_visit"]),
+            ServiceDetail(name="Packshot produit (10 visuels)", price=550000, currency="Ar", duration_min=180, options=["in_office", "home_visit"]),
+        ],
+    ),
+    Prestataire(
+        name="Riva Photographer",
+        specialty="Photo de famille",
+        category="photo",
+        description="Photos de famille en extérieur, séances grossesse, nouveau-né. Style naturel et lumineux.",
+        services=["photo famille", "maternité", "nouveau-né", "anniversaire"],
+        city="Antananarivo", country="Madagascar", address="Ambatobe",
+        latitude=_tana("Ambatobe")[0], longitude=_tana("Ambatobe")[1],
+        languages=["mg", "fr"],
+        rating=4.6, years_experience=4,
+        accepts_payment=["mvola", "orange_money"],
+        hourly_rate=0, min_price=180000, max_price=900000, currency="Ar",
+        phone="+261 33 27 451 80",
+    ),
+
+    # ── Couture & artisanat (2) ──────────────────────────────────────────────
+    Prestataire(
+        name="Atelier Bao",
+        organization="Atelier Bao",
+        specialty="Couture sur mesure",
+        category="tailoring",
+        description="Atelier de couture, robes lamba, costumes hommes, retouches, broderie traditionnelle malgache.",
+        services=["robe sur mesure", "costume", "retouche", "broderie", "lamba"],
+        specialties=["Lamba traditionnel", "Robe mariage", "Costume sur mesure"],
+        bio="Atelier familial depuis 1998. Maîtrise du tissage lamba akotofahana.",
+        city="Antananarivo", country="Madagascar", address="Analakely, rue de la victoire",
+        latitude=_tana("Analakely")[0], longitude=_tana("Analakely")[1],
+        languages=["mg", "fr"],
+        verified=True, rating=4.7, years_experience=26, team_size=4,
+        accepts_payment=["cash", "mvola"],
+        hourly_rate=0, min_price=15000, max_price=1500000, currency="Ar",
+        phone="+261 34 33 444 12",
+        services_detail=[
+            ServiceDetail(name="Retouche standard", price=15000, currency="Ar", duration_min=60, options=["in_office"]),
+            ServiceDetail(name="Robe sur mesure", price=380000, currency="Ar", duration_min=600, options=["in_office"]),
+        ],
+    ),
+    Prestataire(
+        name="Hanta Couturière",
+        specialty="Couture femme",
+        category="tailoring",
+        description="Couture femme rapide, retouches express. Spécialité tenues bureau et soirée.",
+        services=["retouche", "robe", "jupe", "blazer"],
+        city="Antananarivo", country="Madagascar", address="Soanierana",
+        latitude=_tana("Soanierana")[0], longitude=_tana("Soanierana")[1],
+        languages=["mg"],
+        rating=4.3, years_experience=6,
+        accepts_payment=["cash", "mvola"],
+        hourly_rate=0, min_price=10000, max_price=400000, currency="Ar",
+        phone="+261 33 99 232 14",
+    ),
+
+    # ── Restauration / traiteur (2) ──────────────────────────────────────────
+    Prestataire(
+        name="Traiteur Vary",
+        organization="Vary Traiteur",
+        specialty="Cuisine malgache traditionnelle",
+        category="food",
+        description="Traiteur cuisine malgache et internationale pour événements. Romazava, ravitoto, ro-mavo... Service buffet 50-500 personnes.",
+        services=["buffet", "cocktail dînatoire", "plats malgaches", "wedding cake"],
+        specialties=["Cuisine malgache authentique", "Buffet événementiel", "Wedding cake"],
+        bio="Cheffe formée Institut Hôtelier d'Antananarivo. 15 ans en traiteur de luxe.",
+        city="Antananarivo", country="Madagascar", address="Ankorondrano",
+        latitude=_tana("Ankorondrano")[0], longitude=_tana("Ankorondrano")[1],
+        languages=["mg", "fr", "en"],
+        verified=True, rating=4.9, years_experience=15, team_size=10,
+        accepts_payment=["cash", "mvola", "card", "bank_transfer"],
+        hourly_rate=0, min_price=25000, max_price=15000000, currency="Ar",
+        phone="+261 34 88 901 32", email="vary@varytraiteur.mg",
+        services_detail=[
+            ServiceDetail(name="Buffet par personne", price=45000, currency="Ar", duration_min=0, options=["home_visit"]),
+            ServiceDetail(name="Cocktail dînatoire 100 pers.", price=4500000, currency="Ar", duration_min=240, options=["home_visit"]),
+        ],
+    ),
+    Prestataire(
+        name="Chef Mahery",
+        specialty="Chef à domicile",
+        category="food",
+        description="Chef privé pour repas à domicile, dîners romantiques, anniversaires. Cuisine fusion malgache-française.",
+        services=["chef à domicile", "menu sur mesure", "dîner romantique"],
+        city="Antananarivo", country="Madagascar", address="Ivandry",
+        latitude=_tana("Ivandry")[0], longitude=_tana("Ivandry")[1],
+        languages=["mg", "fr"],
+        rating=4.7, years_experience=8,
+        accepts_payment=["mvola", "card"],
+        hourly_rate=0, min_price=180000, max_price=1500000, currency="Ar",
+        phone="+261 33 56 123 45",
+        services_detail=[
+            ServiceDetail(name="Dîner 2 personnes", price=320000, currency="Ar", duration_min=240, options=["home_visit"]),
+        ],
+    ),
+
+    # ── Tourisme / Guide (1) ─────────────────────────────────────────────────
+    Prestataire(
+        name="Faly Guide",
+        specialty="Guide touristique Madagascar",
+        category="tourism",
+        description="Guide professionnel, circuits sur mesure Madagascar : RN7, baobabs, Nosy Be, Andasibe. Anglais et français.",
+        services=["circuits Madagascar", "trek nature", "réservation lodges", "transport 4x4"],
+        specialties=["RN7 Tana-Tulear", "Baobabs Morondava", "Andasibe forêt", "Nosy Be"],
+        bio="Guide certifié ONTM. 18 ans d'expérience. Véhicule 4x4 et équipement camping inclus.",
+        city="Antananarivo", country="Madagascar",
+        languages=["mg", "fr", "en"],
+        verified=True, rating=5.0, years_experience=18,
+        accepts_payment=["cash", "mvola", "card", "bank_transfer"],
+        certifications=["Guide ONTM officiel"],
+        hourly_rate=0, min_price=200000, max_price=18000000, currency="Ar",
+        phone="+261 34 22 558 90", email="faly@falyguide.mg",
+        services_detail=[
+            ServiceDetail(name="Journée guidée Tana", price=350000, currency="Ar", duration_min=480, options=["home_visit", "video_call"]),
+            ServiceDetail(name="Circuit RN7 8 jours", price=12000000, currency="Ar", duration_min=0, options=["video_call"]),
+        ],
+    ),
+
+    # ── Tutorat scolaire (1) ────────────────────────────────────────────────
+    Prestataire(
+        name="Tahiana Maths",
+        specialty="Tutorat maths & physique",
+        category="tutoring",
+        description="Cours particuliers maths/physique lycée et préparation bac. À domicile ou en visio.",
+        services=["maths lycée", "physique", "prépa bac", "prépa concours"],
+        bio="Diplômé Polytechnique Antananarivo. 5 ans d'expérience tutorat.",
+        city="Antananarivo", country="Madagascar", address="Antanimena",
+        latitude=_tana("Antanimena")[0], longitude=_tana("Antanimena")[1],
+        languages=["mg", "fr"],
+        rating=4.8, years_experience=5,
+        accepts_payment=["mvola", "orange_money"],
+        hourly_rate=25000, min_price=20000, max_price=50000, currency="Ar",
+        phone="+261 34 78 100 23",
+        services_detail=[
+            ServiceDetail(name="Cours individuel 1h", price=25000, currency="Ar", duration_min=60, options=["home_visit", "video_call"]),
+            ServiceDetail(name="Forfait 10 cours", price=220000, currency="Ar", duration_min=600, options=["home_visit", "video_call"]),
+        ],
+    ),
+
+    # ── Jardinage / Nettoyage (1) ───────────────────────────────────────────
+    Prestataire(
+        name="Jardin Voara",
+        specialty="Jardinage & espaces verts",
+        category="gardening",
+        description="Entretien jardins, taille haie, élagage, création potager, gazon synthétique.",
+        services=["taille", "élagage", "potager", "gazon", "irrigation"],
+        bio="Équipe de 4 jardiniers. Matériel pro. Contrats mensuels possibles.",
+        city="Antananarivo", country="Madagascar", address="Tanjombato",
+        latitude=_tana("Tanjombato")[0], longitude=_tana("Tanjombato")[1],
+        languages=["mg", "fr"],
+        rating=4.4, years_experience=11, team_size=4,
+        accepts_payment=["cash", "mvola", "bank_transfer"],
+        hourly_rate=12000, min_price=80000, max_price=2500000, currency="Ar",
+        phone="+261 33 49 887 22",
+    ),
+
+    # ── Déménagement (1) ────────────────────────────────────────────────────
+    Prestataire(
+        name="Mavo Transport",
+        organization="Mavo Transport SARL",
+        specialty="Déménagement & transport",
+        category="moving",
+        description="Déménagement résidentiel et professionnel. Camion 5T, équipe formée, emballage et démontage.",
+        services=["déménagement", "transport lourd", "emballage", "stockage"],
+        bio="Camion 5T avec hayon élévateur. 6 manutentionnaires expérimentés. Devis sous 24h.",
+        city="Antananarivo", country="Madagascar", address="Tanjombato",
+        latitude=_tana("Tanjombato")[0], longitude=_tana("Tanjombato")[1],
+        languages=["mg", "fr"],
+        verified=True, rating=4.5, years_experience=9, team_size=6,
+        accepts_payment=["cash", "mvola", "bank_transfer"],
+        hourly_rate=0, min_price=350000, max_price=8000000, currency="Ar",
+        phone="+261 34 90 654 21", email="mavo@mavotransport.mg",
+        services_detail=[
+            ServiceDetail(name="Devis déménagement", price=0, currency="Ar", duration_min=60, options=["home_visit", "video_call"]),
+            ServiceDetail(name="Déménagement F3 intra-Tana", price=850000, currency="Ar", duration_min=480, options=["home_visit"]),
+        ],
     ),
 ]
 
 
-async def load_seed_prestataires(
-    store: PGVectorStore,
-    embed_svc: EmbeddingService,
-    max_retries: int = 3,
-) -> None:
-    existing = await store.count
-    if existing >= len(SEED_PRESTATAIRES):
-        logger.info("Seed already loaded (%d prestataires), skipping.", existing)
+async def load_seed_prestataires(store: PGVectorStore, embed_svc: EmbeddingService) -> None:
+    """Embed and insert seed prestataires only if the table is empty."""
+    current = await store.count
+    if current and current >= len(SEED_PRESTATAIRES):
+        logger.info("Seed skipped — %d prestataires already in DB", current)
         return
-
-    start = time.time()
-    total = len(SEED_PRESTATAIRES)
-    logger.info("Loading %d seed providers...", total)
-
-    for i, prestataire in enumerate(SEED_PRESTATAIRES):
-        for attempt in range(max_retries):
-            try:
-                embedding = embed_svc.embed_prestataire(prestataire)
-                await store.add(prestataire, embedding)
-                logger.info("[%d/%d] Loaded: %s (%s)", i + 1, total, prestataire.name, prestataire.specialty)
-                break
-            except ClientError as e:
-                if "429" in str(e) and attempt < max_retries - 1:
-                    wait = 2 ** (attempt + 1)
-                    logger.warning("Rate limited, retrying in %ds...", wait)
-                    await asyncio.sleep(wait)
-                else:
-                    raise
-
-    elapsed = time.time() - start
-    final_count = await store.count
-    logger.info("Seed loading complete: %d providers in %.1fs", final_count, elapsed)
+    logger.info("Seeding %d prestataires (current=%d)…", len(SEED_PRESTATAIRES), current)
+    success = 0
+    for i, p in enumerate(SEED_PRESTATAIRES, start=1):
+        try:
+            embedding = embed_svc.embed_prestataire(p)
+        except ClientError as e:
+            logger.warning("Embedding skipped for %s: %s", p.name, e)
+            continue
+        except Exception as e:  # noqa: BLE001
+            logger.warning("Embedding failed for %s: %s", p.name, e)
+            continue
+        await store.add(p, embedding)
+        success += 1
+        if i % 5 == 0:
+            await asyncio.sleep(0.4)  # gentle pacing for the embedding rate limits
+    logger.info("Seed complete — %d/%d prestataires inserted", success, len(SEED_PRESTATAIRES))

@@ -39,10 +39,23 @@ class EmbeddingService:
             prestataire.description,
             ", ".join(prestataire.services),
         ]
+        if prestataire.bio:
+            parts.append(prestataire.bio)
+        if prestataire.category:
+            parts.append(f"Category: {prestataire.category}")
+        if prestataire.specialties:
+            parts.append("Specialties: " + ", ".join(prestataire.specialties))
+        if prestataire.organization:
+            parts.append(f"Organization: {prestataire.organization}")
         if prestataire.city:
             parts.append(f"City: {prestataire.city}")
+        if prestataire.languages:
+            parts.append("Languages: " + ", ".join(prestataire.languages))
         if prestataire.hourly_rate > 0:
-            parts.append(f"Rate: {prestataire.hourly_rate}/h")
+            parts.append(f"Rate: {prestataire.hourly_rate} {prestataire.currency or 'Ar'}/h")
+        if prestataire.services_detail:
+            sd_lines = [f"{sd.name} ({sd.price} {sd.currency})" for sd in prestataire.services_detail]
+            parts.append("Services: " + ", ".join(sd_lines))
         return " | ".join(parts)
 
     def _normalize(self, vector: np.ndarray) -> np.ndarray:

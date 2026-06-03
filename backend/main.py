@@ -13,6 +13,7 @@ from chat_service import ChatService
 from config import Settings
 from embedding_service import EmbeddingService, UnsupportedImageError
 from auth_service import AuthService, SESSION_COOKIE_NAME, SESSION_LIFETIME_DAYS
+from criteria_extractor import CriteriaExtractor, sanitize_for_user
 from models import (
     ConnectRequest,
     LoginRequest,
@@ -31,6 +32,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 settings = Settings()
 embed_svc = EmbeddingService(settings)
 chat_svc = ChatService(settings)
+criteria_svc = CriteriaExtractor(settings)
 vector_store: PGVectorStore | None = None
 auth_svc: AuthService | None = None
 
@@ -189,13 +191,21 @@ async def search(request: SearchRequest):
             logger.error("Image description failed: %s", e)
             raise HTTPException(502, "Image analysis service temporarily unavailable.") from e
 
+    # Criteria extraction (cheap LLM call) — produces filters + intent text
+    criteria = await criteria_svc.extract(request.text or "", image_description)
+    embed_text = criteria.intent_text or " ".join(filter(None, [request.text, image_description]))
     try:
-        query_embedding = embed_svc.embed_query(text=request.text, image_description=image_description)
+        query_embedding = embed_svc.embed_query(text=embed_text, image_description=image_description)
     except GeminiAPIError as e:
         logger.error("Embedding failed: %s", e)
         raise HTTPException(502, "Embedding service unavailable") from e
 
-    return await _store().search(query_embedding, top_k=settings.TOP_K_RESULTS)
+    # Hybrid retrieval: structured filter narrows the candidate set, vector ranks within
+    results = await _store().filtered_search(query_embedding, criteria, top_k=settings.TOP_K_RESULTS)
+    # Fallback to pure semantic if filter eliminates everything
+    if not results:
+        results = await _store().search(query_embedding, top_k=settings.TOP_K_RESULTS)
+    return results
 
 
 # --- POST /chat ---
@@ -215,19 +225,26 @@ async def chat(request: SearchRequest):
             logger.error("Image description failed: %s", e)
             raise HTTPException(502, "Image analysis service temporarily unavailable.") from e
 
+    criteria = await criteria_svc.extract(request.text or "", image_description)
+    embed_text = criteria.intent_text or " ".join(filter(None, [request.text, image_description]))
     try:
-        query_embedding = embed_svc.embed_query(text=request.text, image_description=image_description)
+        query_embedding = embed_svc.embed_query(text=embed_text, image_description=image_description)
     except GeminiAPIError as e:
         logger.error("Embedding failed: %s", e)
         raise HTTPException(502, "Embedding service unavailable") from e
 
-    results = await _store().search(query_embedding, top_k=settings.TOP_K_RESULTS)
+    results = await _store().filtered_search(query_embedding, criteria, top_k=settings.TOP_K_RESULTS)
+    if not results:
+        results = await _store().search(query_embedding, top_k=settings.TOP_K_RESULTS)
     user_message = " ".join(filter(None, [request.text, image_description]))
 
     async def event_stream():
         try:
             async for token in chat_svc.generate_response_stream(user_message, results):
-                yield f"data: {token}\n\n"
+                # Strip markdown / stars before sending to the user
+                clean = sanitize_for_user(token)
+                if clean:
+                    yield f"data: {clean}\n\n"
             yield "data: [DONE]\n\n"
         except GroqAPIError as e:
             logger.error("Chat generation failed: %s", e)
