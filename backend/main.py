@@ -13,7 +13,7 @@ from chat_service import ChatService
 from config import Settings
 from embedding_service import EmbeddingService, UnsupportedImageError
 from auth_service import AuthService, SESSION_COOKIE_NAME, SESSION_LIFETIME_DAYS
-from criteria_extractor import CriteriaExtractor, sanitize_for_user
+from criteria_extractor import CriteriaExtractor
 from models import (
     ConnectRequest,
     LoginRequest,
@@ -241,10 +241,10 @@ async def chat(request: SearchRequest):
     async def event_stream():
         try:
             async for token in chat_svc.generate_response_stream(user_message, results):
-                # Strip markdown / stars before sending to the user
-                clean = sanitize_for_user(token)
-                if clean:
-                    yield f"data: {clean}\n\n"
+                # Forward raw tokens — sanitization happens client-side on the full
+                # accumulated text so we don't drop the spaces between tokens.
+                if token:
+                    yield f"data: {token}\n\n"
             yield "data: [DONE]\n\n"
         except GroqAPIError as e:
             logger.error("Chat generation failed: %s", e)
