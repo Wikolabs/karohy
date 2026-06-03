@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -44,7 +44,7 @@ function LoginForm() {
       <div style={{ background: "#fff", borderRadius: 16, padding: "48px 40px", width: "100%", maxWidth: 400, boxShadow: "0 4px 32px rgba(220,38,38,0.10)", border: "1px solid #fecaca" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/karohy-logo.png" alt="Karohy.mg" style={{ height: 56, marginBottom: 8 }} />
+          <img src="/karohy-logo.png" alt="Karohy" style={{ height: 56, marginBottom: 8 }} />
           <p style={{ color: "#888", fontSize: 14, marginTop: 4 }}>Accès administration</p>
         </div>
 

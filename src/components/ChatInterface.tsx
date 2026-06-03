@@ -16,9 +16,28 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  "Plombier à Paris moins de 60€/h",
-  "Développeur web React expert",
-  "Designer graphique freelance logo",
+  "Plombier à Antananarivo moins de 60 000 Ar/h",
+  "Développeur web React expert remote",
+  "Designer graphique freelance pour logo de boutique",
+  "Photographe mariage Antananarivo",
+];
+
+const FEATURES = [
+  {
+    icon: "🎯",
+    title: "Matching sémantique",
+    desc: "L'IA comprend le contexte, la spécialité et la localisation pour trouver les prestataires les plus pertinents en moins d'une seconde.",
+  },
+  {
+    icon: "📸",
+    title: "Recherche par image",
+    desc: "Montrez un exemple visuel de ce que vous cherchez. L'IA analyse l'image et identifie les prestataires dont le profil correspond visuellement.",
+  },
+  {
+    icon: "💬",
+    title: "Chat IA intégré",
+    desc: "Affinez votre recherche en conversant avec l'assistant. Il contextualise votre demande et recommande parmi les prestataires disponibles.",
+  },
 ];
 
 function BotIcon() {
@@ -130,9 +149,15 @@ export default function ChatInterface() {
     }
   };
 
+  const hasMessages = messages.length > 0;
+
   return (
     <div
-      className="flex flex-col h-full relative bg-gray-50"
+      className="flex flex-col relative bg-white transition-all duration-500"
+      style={{
+        minHeight: hasMessages ? "min(78vh, 760px)" : 480,
+        maxHeight: "88vh",
+      }}
       onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
       onDragLeave={(e) => {
         if (e.currentTarget === e.target || !e.currentTarget.contains(e.relatedTarget as Node)) {
@@ -155,22 +180,46 @@ export default function ChatInterface() {
 
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center px-4">
-            <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-gray-800 mb-1">Trouvez le bon prestataire</h2>
-            <p className="text-gray-500 text-sm mb-6 max-w-sm leading-relaxed">
-              Décrivez le service dont vous avez besoin, votre localisation ou budget et notre IA trouvera les meilleurs professionnels.
+          <div className="flex flex-col items-center text-center px-4 py-6 max-w-4xl mx-auto w-full">
+            {/* Headline */}
+            <span className="inline-block bg-red-100 text-red-600 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide uppercase mb-5">
+              Matching prestataires propulsé par l'IA
+            </span>
+            <h1 className="font-bold text-gray-900 leading-tight mb-3" style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.85rem, 3.8vw, 2.6rem)" }}>
+              Trouvez le bon prestataire.
+              <span className="block text-red-600">En quelques secondes.</span>
+            </h1>
+            <p className="text-gray-600 text-base max-w-xl leading-relaxed mb-8">
+              Décrivez votre besoin en langage naturel ou envoyez une image. L&apos;assistant comprend votre contexte et vous propose les meilleurs profils correspondants.
             </p>
-            <div className="flex flex-wrap gap-2 justify-center">
+
+            {/* 3 feature cards inline — no LLM model names */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-8">
+              {FEATURES.map((f) => (
+                <div
+                  key={f.title}
+                  className="text-left rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-red-50/40 p-5 hover:border-red-300 hover:shadow-md transition-all"
+                >
+                  <div className="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center text-xl mb-3">
+                    {f.icon}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-sm mb-1.5" style={{ fontFamily: "var(--font-display)" }}>
+                    {f.title}
+                  </h3>
+                  <p className="text-gray-600 text-xs leading-relaxed">
+                    {f.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Quick suggestion chips */}
+            <div className="flex flex-wrap gap-2 justify-center max-w-2xl">
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
                   onClick={() => handleSend(s)}
-                  className="text-sm bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-full hover:border-red-400 hover:text-red-700 hover:bg-red-50 transition-all shadow-sm"
+                  className="text-xs sm:text-sm bg-white border border-gray-200 text-gray-700 px-3.5 py-2 rounded-full hover:border-red-400 hover:text-red-700 hover:bg-red-50 transition-all shadow-sm"
                 >
                   {s}
                 </button>

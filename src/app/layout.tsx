@@ -6,8 +6,8 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-displ
 const inter = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Karohy.mg — Matching prestataires IA",
-  description: "Trouvez le bon prestataire en quelques secondes. Recherche sémantique + vision IA, streaming temps réel. Powered by Gemini + Groq.",
+  title: "Karohy — Matching prestataires IA",
+  description: "Trouvez le bon prestataire en quelques secondes. Recherche sémantique et par image, assistant conversationnel en temps réel.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

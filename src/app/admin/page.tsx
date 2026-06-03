@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef, FormEvent, ChangeEvent, CSSProperties, ReactNode } from "react";
 import { useRouter } from "next/navigation";
@@ -122,7 +122,7 @@ export default function AdminPage() {
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <a href="/" style={{ display: "flex", alignItems: "center", gap: 6, textDecoration: "none" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/karohy-logo.png" alt="Karohy.mg" style={{ height: 52, width: "auto", objectFit: "contain" }} />
+            <img src="/karohy-logo.png" alt="Karohy" style={{ height: 52, width: "auto", objectFit: "contain" }} />
             <span style={{ fontWeight: 800, fontSize: 15, color: "#999" }}>.mg</span>
           </a>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
