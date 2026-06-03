@@ -5,6 +5,20 @@ import { searchPrestataires } from "../services/api";
 import { chatStream } from "../services/chatStream";
 import type { SearchResult } from "../types";
 import ProviderCard from "./ProviderCard";
+import SkeletonCard from "./SkeletonCard";
+
+/** Strip Markdown, rating stars and leading bullet markers before showing to the user. */
+function sanitizeAssistantText(text: string): string {
+  if (!text) return text;
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/\*(.+?)\*/g, "$1")
+    .replace(/^\s*#{1,6}\s+/gm, "")
+    .replace(/[★⭐]+/g, "")
+    .replace(/^\s*[*\-•]\s+/gm, "• ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
 
 const MAX_SIZE = 5 * 1024 * 1024;
 
@@ -135,9 +149,10 @@ export default function ChatInterface() {
       let accumulated = "";
       for await (const token of chatStream(text || undefined, image || undefined)) {
         accumulated += token;
+        const clean = sanitizeAssistantText(accumulated);
         setMessages((prev) => {
           const updated = [...prev];
-          updated[updated.length - 1] = { ...updated[updated.length - 1], content: accumulated };
+          updated[updated.length - 1] = { ...updated[updated.length - 1], content: clean };
           return updated;
         });
       }
@@ -149,14 +164,12 @@ export default function ChatInterface() {
     }
   };
 
-  const hasMessages = messages.length > 0;
-
   return (
     <div
-      className="flex flex-col relative bg-white transition-all duration-500"
+      className="flex flex-col relative bg-white"
       style={{
-        minHeight: hasMessages ? "min(78vh, 760px)" : 480,
-        maxHeight: "88vh",
+        minHeight: 460,
+        maxHeight: "min(88vh, 880px)",
       }}
       onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
       onDragLeave={(e) => {
@@ -268,7 +281,16 @@ export default function ChatInterface() {
           </div>
         ))}
 
-        {loading && <LoadingDots />}
+        {loading && (
+          <>
+            <LoadingDots />
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 mt-4">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+          </>
+        )}
         <div ref={bottomRef} />
       </div>
 
