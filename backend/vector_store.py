@@ -273,9 +273,11 @@ def _build_where_clause(c: CriteriaFilter) -> tuple[str, list]:
     if c.currency:
         add("(currency = {} OR currency = '')", c.currency)
     if c.max_price is not None and c.max_price > 0:
-        # match if any pricing field fits the budget
+        # match if any pricing field fits the budget (positional placeholders are filled
+        # left-to-right by the helper, so we pass the same value twice)
         add(
-            "(min_price <= {0} OR (hourly_rate > 0 AND hourly_rate <= {0}))",
+            "(min_price <= {} OR (hourly_rate > 0 AND hourly_rate <= {}))",
+            c.max_price,
             c.max_price,
         )
     if c.min_price is not None and c.min_price > 0:

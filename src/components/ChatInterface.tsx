@@ -191,29 +191,32 @@ export default function ChatInterface() {
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-5 py-5 sm:py-6 space-y-5 sm:space-y-6">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center text-center px-4 py-6 max-w-4xl mx-auto w-full">
+          <div className="flex flex-col items-center text-center px-1 sm:px-4 py-2 sm:py-6 max-w-4xl mx-auto w-full">
             {/* Headline */}
-            <span className="inline-block bg-red-100 text-red-600 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide uppercase mb-5">
-              Matching prestataires propulsé par l'IA
+            <span className="inline-block bg-red-100 text-red-600 rounded-full px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold tracking-wide uppercase mb-4 sm:mb-5">
+              Matching prestataires propulsé par l&apos;IA
             </span>
-            <h1 className="font-bold text-gray-900 leading-tight mb-3" style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.85rem, 3.8vw, 2.6rem)" }}>
+            <h1
+              className="font-bold text-gray-900 leading-[1.1] mb-3"
+              style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.55rem, 5.4vw, 2.6rem)" }}
+            >
               Trouvez le bon prestataire.
               <span className="block text-red-600">En quelques secondes.</span>
             </h1>
-            <p className="text-gray-600 text-base max-w-xl leading-relaxed mb-8">
+            <p className="text-gray-600 text-sm sm:text-base max-w-xl leading-relaxed mb-6 sm:mb-8 px-1">
               Décrivez votre besoin en langage naturel ou envoyez une image. L&apos;assistant comprend votre contexte et vous propose les meilleurs profils correspondants.
             </p>
 
             {/* 3 feature cards inline — no LLM model names */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full mb-6 sm:mb-8">
               {FEATURES.map((f) => (
                 <div
                   key={f.title}
-                  className="text-left rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-red-50/40 p-5 hover:border-red-300 hover:shadow-md transition-all"
+                  className="text-left rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-red-50/40 p-4 sm:p-5 hover:border-red-300 hover:shadow-md transition-all"
                 >
-                  <div className="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center text-xl mb-3">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-red-100 flex items-center justify-center text-lg sm:text-xl mb-2.5 sm:mb-3">
                     {f.icon}
                   </div>
                   <h3 className="font-semibold text-gray-900 text-sm mb-1.5" style={{ fontFamily: "var(--font-display)" }}>
@@ -227,12 +230,12 @@ export default function ChatInterface() {
             </div>
 
             {/* Quick suggestion chips */}
-            <div className="flex flex-wrap gap-2 justify-center max-w-2xl">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center max-w-2xl">
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
                   onClick={() => handleSend(s)}
-                  className="text-xs sm:text-sm bg-white border border-gray-200 text-gray-700 px-3.5 py-2 rounded-full hover:border-red-400 hover:text-red-700 hover:bg-red-50 transition-all shadow-sm"
+                  className="text-[11px] sm:text-sm bg-white border border-gray-200 text-gray-700 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full hover:border-red-400 hover:text-red-700 hover:bg-red-50 active:bg-red-100 transition-all shadow-sm"
                 >
                   {s}
                 </button>
@@ -294,14 +297,15 @@ export default function ChatInterface() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-gray-200 bg-white p-4">
+      <div className="border-t border-gray-200 bg-white p-3 sm:p-4">
         {imageBase64 && (
           <div className="flex items-center gap-3 mb-3 px-1">
             <div className="relative inline-block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`data:image/jpeg;base64,${imageBase64}`}
                 alt="Preview"
-                className="h-14 rounded-lg border border-gray-200 shadow-sm"
+                className="h-12 sm:h-14 rounded-lg border border-gray-200 shadow-sm"
               />
               <button
                 type="button"
@@ -311,10 +315,10 @@ export default function ChatInterface() {
                 ✕
               </button>
             </div>
-            <span className="text-xs text-gray-400">Image prête — ajoutez une description ou envoyez directement</span>
+            <span className="text-[11px] sm:text-xs text-gray-400">Image prête — ajoutez une description ou envoyez directement</span>
           </div>
         )}
-        <div className="flex gap-2 items-center bg-gray-50 border border-gray-200 rounded-2xl px-3 py-2 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100 transition-all">
+        <div className="flex gap-1.5 sm:gap-2 items-center bg-gray-50 border border-gray-200 rounded-2xl px-2 sm:px-3 py-1.5 sm:py-2 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100 transition-all">
           <label
             className={`p-1.5 rounded-xl cursor-pointer transition-colors shrink-0 ${
               imageBase64 ? "text-red-600 bg-red-100" : "text-gray-400 hover:text-red-600 hover:bg-red-50"
@@ -347,19 +351,18 @@ export default function ChatInterface() {
               }
             }}
             disabled={loading}
-            placeholder="Décrivez le service ou le prestataire recherché..."
-            className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none disabled:opacity-50 py-1"
+            placeholder="Décrivez votre besoin..."
+            className="flex-1 min-w-0 bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none disabled:opacity-50 py-1"
           />
           <button
             onClick={() => handleSend()}
             disabled={loading || (!input.trim() && !imageBase64)}
-            className="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0 flex items-center gap-1.5"
+            className="bg-red-600 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0 flex items-center gap-1.5"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.269 20.876L5.999 12zm0 0h7.5" />
             </svg>
-            Rechercher
-          </button>
+            <span className="hidden sm:inline">Rechercher</span>
         </div>
       </div>
     </div>

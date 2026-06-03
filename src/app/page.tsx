@@ -7,16 +7,24 @@ export default function Home() {
   return (
     <main style={{ fontFamily: "var(--font-body)", background: `linear-gradient(160deg, ${bgLight} 0%, #fff 60%)`, minHeight: "100vh" }}>
       {/* NAVBAR */}
-      <nav style={{ background: "rgba(255,255,255,0.78)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid #fecaca", position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", height: 76, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <a href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }} aria-label="Karohy">
+      <nav
+        className="sticky top-0 z-50 border-b border-red-100"
+        style={{ background: "rgba(255,255,255,0.78)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}
+      >
+        <div className="mx-auto px-3 sm:px-5 max-w-[1200px] h-16 sm:h-[76px] flex items-center justify-between">
+          <a href="/" className="flex items-center no-underline" aria-label="Karohy">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/karohy-logo.png" alt="Karohy" style={{ height: 68, width: "auto", objectFit: "contain" }} />
+            <img
+              src="/karohy-logo.png"
+              alt="Karohy"
+              className="object-contain"
+              style={{ height: "clamp(44px, 9vw, 68px)", width: "auto" }}
+            />
           </a>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <a
               href="/admin"
-              style={{ fontSize: 13, fontWeight: 600, color: "#999", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #e5e7eb" }}
+              className="hidden sm:inline-block text-xs sm:text-sm font-semibold text-gray-500 hover:text-red-600 px-2.5 sm:px-3 py-1.5 rounded-md border border-gray-200 hover:border-red-300"
             >
               Admin
             </a>
@@ -24,65 +32,36 @@ export default function Home() {
               href="https://wa.me/261386626100?text=Bonjour%2C%20je%20souhaite%20discuter%20de%20Karohy%20avec%20Wikolabs."
               target="_blank"
               rel="noopener noreferrer"
-              style={{ background: "#25d366", color: "#fff", padding: "10px 18px", borderRadius: 100, fontWeight: 600, fontSize: 13.5, textDecoration: "none" }}
+              className="text-white font-semibold rounded-full no-underline"
+              style={{ background: "#25d366", padding: "8px 12px", fontSize: 13 }}
             >
-              WhatsApp
+              <span className="sm:hidden" aria-label="WhatsApp">💬</span>
+              <span className="hidden sm:inline">WhatsApp</span>
             </a>
             <a
               href="https://cal.com/wikolabs-team/30min"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ background: primary, color: "#fff", padding: "10px 22px", borderRadius: 100, fontWeight: 600, fontSize: 13.5, textDecoration: "none" }}
+              className="text-white font-semibold rounded-full no-underline"
+              style={{ background: primary, padding: "8px 14px", fontSize: 13 }}
             >
-              Réserver un appel
+              <span className="sm:hidden" aria-label="Cal.com">📅</span>
+              <span className="hidden sm:inline">Réserver un appel</span>
             </a>
           </div>
         </div>
       </nav>
 
       {/* CHATBOT-CENTRIC HERO — all descriptive content lives inside ChatInterface */}
-      <section style={{ padding: "48px 24px 96px" }}>
+      <section className="px-3 sm:px-6 pt-6 pb-12 sm:pb-16">
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div
+            className="bg-white border border-red-100 sm:border-red-200 rounded-2xl sm:rounded-3xl overflow-hidden"
             style={{
-              background: "#fff",
-              border: "1px solid #fecaca",
-              borderRadius: 24,
               boxShadow: "0 18px 56px rgba(220,38,38,0.12), 0 4px 16px rgba(0,0,0,0.06)",
-              overflow: "hidden",
             }}
           >
             <ChatInterface />
-          </div>
-        </div>
-      </section>
-
-      {/* SLIM CTA STRIP */}
-      <section style={{ background: primary, padding: "56px 24px" }}>
-        <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
-          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.5rem, 3vw, 2.1rem)", fontWeight: 800, color: "#fff", marginBottom: 14, lineHeight: 1.2 }}>
-            Connectez les bons prestataires
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, marginBottom: 28 }}>
-            Démo gratuite. Mise en place en 48h.
-          </p>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-            <a
-              href="https://cal.com/wikolabs-team/30min"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ background: "#fff", color: primary, padding: "13px 26px", borderRadius: 100, fontWeight: 700, fontSize: 14.5, textDecoration: "none" }}
-            >
-              📅 Réserver un appel
-            </a>
-            <a
-              href="https://wa.me/261386626100?text=Bonjour%2C%20je%20souhaite%20discuter%20de%20Karohy%20avec%20Wikolabs."
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ background: "#25d366", color: "#fff", padding: "13px 26px", borderRadius: 100, fontWeight: 700, fontSize: 14.5, textDecoration: "none" }}
-            >
-              💬 WhatsApp
-            </a>
           </div>
         </div>
       </section>
