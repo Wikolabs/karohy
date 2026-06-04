@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+﻿from datetime import datetime, timezone
 from typing import Literal
 from uuid import uuid4
 
@@ -43,7 +43,7 @@ class Prestataire(BaseModel):
     longitude: float | None = None
     address: str = Field(max_length=300, default="")
 
-    # Filterable criteria (Lot 4) — driven by SQL filter before vector search
+    # Filterable criteria (Lot 4) · driven by SQL filter before vector search
     category: str = Field(max_length=60, default="")
     languages: list[str] = []
     years_experience: int = Field(ge=0, default=0)

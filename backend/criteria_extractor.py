@@ -1,4 +1,4 @@
-"""Extract a structured CriteriaFilter from a free-text query via a small LLM call.
+﻿"""Extract a structured CriteriaFilter from a free-text query via a small LLM call.
 The extractor uses the same Groq client as the chat service so no extra deps."""
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ _VALID_PAYMENTS = {"cash", "mvola", "orange_money", "airtel_money", "card", "ban
 _VALID_LANGUAGES = {"mg", "fr", "en"}
 
 
-# Known city/quartier aliases for Madagascar — normalise free-form queries
+# Known city/quartier aliases for Madagascar · normalise free-form queries
 _CITY_ALIASES = {
     "tana": "Antananarivo",
     "tnr": "Antananarivo",
@@ -71,7 +71,7 @@ _SYSTEM = (
 
 
 def _parse_json(content: str) -> dict:
-    # Some models wrap in ```json blocks — strip them
+    # Some models wrap in ```json blocks · strip them
     s = content.strip()
     if s.startswith("```"):
         s = s.strip("`")
@@ -122,7 +122,7 @@ class CriteriaExtractor:
             content = resp.choices[0].message.content or "{}"
             data = _parse_json(content)
         except Exception as e:  # noqa: BLE001
-            logger.warning("Criteria extraction failed: %s — falling back to vector-only", e)
+            logger.warning("Criteria extraction failed: %s · falling back to vector-only", e)
             data = {}
 
         # Whitelist + normalise

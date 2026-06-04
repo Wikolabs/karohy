@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useCallback, type DragEvent } from "react";
 import { searchPrestataires } from "../services/api";
@@ -209,7 +209,7 @@ export default function ChatInterface() {
               Décrivez votre besoin en langage naturel ou envoyez une image. L&apos;assistant comprend votre contexte et vous propose les meilleurs profils correspondants.
             </p>
 
-            {/* 3 feature cards inline — no LLM model names */}
+            {/* 3 feature cards inline · no LLM model names */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full mb-6 sm:mb-8">
               {FEATURES.map((f) => (
                 <div
@@ -315,7 +315,7 @@ export default function ChatInterface() {
                 ✕
               </button>
             </div>
-            <span className="text-[11px] sm:text-xs text-gray-400">Image prête — ajoutez une description ou envoyez directement</span>
+            <span className="text-[11px] sm:text-xs text-gray-400">Image prête · ajoutez une description ou envoyez directement</span>
           </div>
         )}
         <div className="flex gap-1.5 sm:gap-2 items-center bg-gray-50 border border-gray-200 rounded-2xl px-2 sm:px-3 py-1.5 sm:py-2 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100 transition-all">

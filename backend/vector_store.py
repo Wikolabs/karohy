@@ -1,4 +1,4 @@
-import json
+﻿import json
 import logging
 
 import asyncpg
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 EMBEDDING_DIM = 3072
 
-# All optional enrichment columns — applied as ALTER TABLE … IF NOT EXISTS
+# All optional enrichment columns · applied as ALTER TABLE … IF NOT EXISTS
 _PRESTATAIRES_EXTRA_COLUMNS = [
     # Lot 3+
     ("organization", "TEXT DEFAULT ''"),
@@ -22,7 +22,7 @@ _PRESTATAIRES_EXTRA_COLUMNS = [
     ("latitude", "DOUBLE PRECISION"),
     ("longitude", "DOUBLE PRECISION"),
     ("address", "TEXT DEFAULT ''"),
-    # Lot 4 — filterable structured criteria
+    # Lot 4 · filterable structured criteria
     ("category", "TEXT DEFAULT ''"),
     ("languages", "JSONB DEFAULT '[]'"),
     ("years_experience", "INTEGER DEFAULT 0"),
@@ -61,7 +61,7 @@ class PGVectorStore:
             await conn.execute("CREATE EXTENSION IF NOT EXISTS vector;")
             await conn.execute('CREATE EXTENSION IF NOT EXISTS "pgcrypto";')
 
-            # Base prestataires table — uses CREATE IF NOT EXISTS so existing schema kept
+            # Base prestataires table · uses CREATE IF NOT EXISTS so existing schema kept
             await conn.execute(f"""
                 CREATE TABLE IF NOT EXISTS prestataires (
                     id          TEXT PRIMARY KEY,

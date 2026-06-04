@@ -191,7 +191,7 @@ async def search(request: SearchRequest):
             logger.error("Image description failed: %s", e)
             raise HTTPException(502, "Image analysis service temporarily unavailable.") from e
 
-    # Criteria extraction (cheap LLM call) — produces filters + intent text
+    # Criteria extraction (cheap LLM call) · produces filters + intent text
     criteria = await criteria_svc.extract(request.text or "", image_description)
     embed_text = criteria.intent_text or " ".join(filter(None, [request.text, image_description]))
     try:
@@ -241,7 +241,7 @@ async def chat(request: SearchRequest):
     async def event_stream():
         try:
             async for token in chat_svc.generate_response_stream(user_message, results):
-                # Forward raw tokens — sanitization happens client-side on the full
+                # Forward raw tokens · sanitization happens client-side on the full
                 # accumulated text so we don't drop the spaces between tokens.
                 if token:
                     yield f"data: {token}\n\n"

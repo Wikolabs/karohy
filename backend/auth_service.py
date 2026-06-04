@@ -1,6 +1,6 @@
-"""Lightweight session-based auth for the Connect flow.
+﻿"""Lightweight session-based auth for the Connect flow.
 Uses PostgreSQL for storage; sha256 with random salt for password hashing
-(good enough for the MVP — swap for argon2 when production-bound)."""
+(good enough for the MVP · swap for argon2 when production-bound)."""
 from __future__ import annotations
 
 import hashlib

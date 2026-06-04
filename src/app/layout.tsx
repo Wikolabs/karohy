@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 
@@ -6,7 +6,7 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-displ
 const inter = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Karohy — Matching prestataires IA",
+  title: "Karohy · Matching prestataires IA",
   description: "Trouvez le bon prestataire en quelques secondes. Recherche sémantique et par image, assistant conversationnel en temps réel.",
 };
 

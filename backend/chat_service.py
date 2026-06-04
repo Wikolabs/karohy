@@ -1,4 +1,4 @@
-import json
+﻿import json
 
 from groq import AsyncGroq
 
@@ -10,7 +10,7 @@ SYSTEM_PROMPT = (
     "Reply in the SAME language as the user (French, Malagasy or English). "
     "Present each matching provider in clear conversational prose. For each one, mention "
     "their name, specialty, city, organization if any, key services, typical price range "
-    "and what makes them a fit for the user's stated need. Keep it short and helpful — "
+    "and what makes them a fit for the user's stated need. Keep it short and helpful · "
     "two or three sentences per provider is enough.\n\n"
     "STRICT FORMATTING RULES:\n"
     "- Do NOT use Markdown. No bold (**), no italics (*), no headings (#).\n"

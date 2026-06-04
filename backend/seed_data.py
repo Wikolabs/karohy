@@ -1,4 +1,4 @@
-"""Mock Malagasy prestataires across multiple categories, vectorised on startup."""
+﻿"""Mock Malagasy prestataires across multiple categories, vectorised on startup."""
 from __future__ import annotations
 
 import asyncio
@@ -517,7 +517,7 @@ async def load_seed_prestataires(store: PGVectorStore, embed_svc: EmbeddingServi
     """Embed and insert seed prestataires only if the table is empty."""
     current = await store.count
     if current and current >= len(SEED_PRESTATAIRES):
-        logger.info("Seed skipped — %d prestataires already in DB", current)
+        logger.info("Seed skipped · %d prestataires already in DB", current)
         return
     logger.info("Seeding %d prestataires (current=%d)…", len(SEED_PRESTATAIRES), current)
     success = 0
@@ -534,4 +534,4 @@ async def load_seed_prestataires(store: PGVectorStore, embed_svc: EmbeddingServi
         success += 1
         if i % 5 == 0:
             await asyncio.sleep(0.4)  # gentle pacing for the embedding rate limits
-    logger.info("Seed complete — %d/%d prestataires inserted", success, len(SEED_PRESTATAIRES))
+    logger.info("Seed complete · %d/%d prestataires inserted", success, len(SEED_PRESTATAIRES))

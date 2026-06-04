@@ -1,4 +1,4 @@
-import ChatInterface from "@/components/ChatInterface";
+﻿import ChatInterface from "@/components/ChatInterface";
 
 export default function Home() {
   const primary = "#dc2626";
@@ -52,7 +52,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* CHATBOT-CENTRIC HERO — all descriptive content lives inside ChatInterface */}
+      {/* CHATBOT-CENTRIC HERO · all descriptive content lives inside ChatInterface */}
       <section className="px-3 sm:px-6 pt-6 pb-12 sm:pb-16">
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div
